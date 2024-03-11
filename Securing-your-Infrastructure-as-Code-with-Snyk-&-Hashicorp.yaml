@@ -1,0 +1,95 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Creates a Cloud9 IDE for the EKS workshop
+
+Parameters:
+  EksWorkshopC9InstanceType:
+    Description: Cloud9 instance type
+    Type: String
+    Default: t3.small
+    AllowedValues:
+      - t2.micro
+      - t3.micro
+      - t3.small
+      - t3.medium
+    ConstraintDescription: Must be a valid Cloud9 instance type
+
+Resources:
+  EksWorkshopC9Instance:
+    Type: AWS::Cloud9::EnvironmentEC2
+    Properties:
+      Description: AWS Cloud9 instance for EKS Workshop
+      ImageId: amazonlinux-2023-x86_64  # Amazon Linux 2
+      AutomaticStopTimeMinutes: 3600
+      InstanceType: !Ref EksWorkshopC9InstanceType
+      Name: snyk-hashicorp-cloud9
+      Tags: 
+        - Key: SSMBootstrap
+          Value: Active
+
+  EksWorkshopC9SSMDocument:
+    Type: AWS::SSM::Document
+    Properties:
+      DocumentType: Command
+      Content:
+        schemaVersion: '2.2'
+        description: Bootstrap Cloud9 Instance
+        mainSteps:
+          - action: aws:runShellScript
+            name: BootstrapCloud9Instance
+            inputs:
+              runCommand:
+                - cd ~/environment
+                - git clone https://github.com/gautambaghel/vulnerable-ec2
+                - cd vulnerable-ec2
+                - sudo yum install -y yum-utils
+                - sudo yum-config-manager --add-repo 'https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo'
+                - sudo yum -y install terraform
+                - curl https://static.snyk.io/cli/latest/snyk-linux -o snyk && \
+                  chmod +x ./snyk && \
+                  sudo mv ./snyk /usr/local/bin/
+
+  BootstrapCustomResource:
+    Type: AWS::CloudFormation::CustomResource
+    DependsOn: EksWorkshopC9Instance
+    Properties:
+      ServiceToken: !GetAtt BootstrapLambdaFunction.Arn
+
+  BootstrapLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: index.handler
+      Role: !GetAtt BootstrapLambdaExecutionRole.Arn
+      Runtime: python3.8
+      Timeout: 300
+      Code:
+        ZipFile: |
+          import boto3
+          import subprocess
+
+          def handler(event, context):
+              instance_id = event['PhysicalResourceId']
+              ssm = boto3.client('ssm')
+              ssm.send_command(
+                  InstanceIds=[instance_id],
+                  DocumentName='YourSSMDocumentName'
+              )
+
+  BootstrapLambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: LambdaExecutionPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ssm:SendCommand
+                Resource: '*'
