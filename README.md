@@ -17,6 +17,7 @@ What will this CloudFormation Template provision?
    - 30 GB Volume
 
 
+
 The first step is to create an IDE with the provided CloudFormation template. The easiest way to do this is using AWS CloudShell in the account you will be running the lab exercises. Open CloudShell with the link below or following this [documentation](https://docs.aws.amazon.com/cloudshell/latest/userguide/getting-started.html#launch-region-shell):
 
 https://console.aws.amazon.com/cloudshell/home
