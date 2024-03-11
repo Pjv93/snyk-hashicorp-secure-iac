@@ -1,13 +1,21 @@
 # snyk-hashicorp-secure-iac
 SNYK AND HASHICORP SECURING YOUR INFRASTRUCTURE AS CODE Workshop CFT [https://snyk-hashicorp.awsworkshop.io/] 
 
-**In your AWS account**
+##In your AWS account
 
 > [!CAUTION]
 > Provisioning this workshop environment in your AWS account will create resources and there will be cost associated with them. The cleanup section provides a guide to remove them, preventing further charges.
 
 
 This section outlines how to set up the environment to run the labs in your own AWS account. 
+
+What will this CloudFormation Template provision?
+
+- Cloud9 Instance with
+   - Snyk Cli
+   - Terraform
+   - 30 GB Volume
+
 
 The first step is to create an IDE with the provided CloudFormation template. The easiest way to do this is using AWS CloudShell in the account you will be running the lab exercises. Open CloudShell with the link below or following this [documentation](https://docs.aws.amazon.com/cloudshell/latest/userguide/getting-started.html#launch-region-shell):
 
