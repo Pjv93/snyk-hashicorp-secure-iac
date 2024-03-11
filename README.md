@@ -26,6 +26,6 @@ aws cloudformation deploy --stack-name snyk-hashicorp-workshop-ide \
 
 The CloudFormation stack will take roughly 5 minutes to deploy, and once completed you can retrieve the URL for the Cloud9 IDE like so:
 
-```sh aws cloudformation describe-stacks --stack-name snyk-hashicorp-workshop-ide \
+``` sh aws cloudformation describe-stacks --stack-name snyk-hashicorp-workshop-ide \
     --query 'Stacks[0].Outputs[?OutputKey==`Cloud9Url`].OutputValue' --output text
 ```
