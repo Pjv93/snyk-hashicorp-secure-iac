@@ -6,14 +6,17 @@ SNYK AND HASHICORP SECURING YOUR INFRASTRUCTURE AS CODE Workshop CFT [https://sn
 > [!CAUTION]
 > Provisioning this workshop environment in your AWS account will create resources and there will be cost associated with them. The cleanup section provides a guide to remove them, preventing further charges.
 
+
 This section outlines how to set up the environment to run the labs in your own AWS account. 
 
 The first step is to create an IDE with the provided CloudFormation template. The easiest way to do this is using AWS CloudShell in the account you will be running the lab exercises. Open CloudShell with the link below or following this documentation:
 
 https://console.aws.amazon.com/cloudshell/home
 
+
 > [!TIP]
 > If using the link above make sure the AWS console has opened in the region that you wish to run the labs in.
+
 
 
 Once CloudShell has loaded run the following commands:
@@ -25,6 +28,7 @@ aws cloudformation deploy --stack-name snyk-hashicorp-workshop-ide \
     --parameter-overrides RepositoryRef=main \
     --capabilities CAPABILITY_NAMED_IAM
 ```
+
 
 The CloudFormation stack will take roughly 5 minutes to deploy, and once completed you can retrieve the URL for the Cloud9 IDE like so:
 
