@@ -1,0 +1,129 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Creates a Cloud9 IDE for the EKS workshop
+
+Parameters:
+  EksWorkshopC9InstanceType:
+    Description: Cloud9 instance type
+    Type: String
+    Default: t3.small
+    AllowedValues:
+      - t2.micro
+      - t3.micro
+      - t3.small
+      - t3.medium
+    ConstraintDescription: Must be a valid Cloud9 instance type
+
+Resources:
+  EksWorkshopC9Instance:
+    Type: AWS::Cloud9::EnvironmentEC2
+    Properties:
+      Description: AWS Cloud9 instance for EKS Workshop
+      ImageId: amazonlinux-2023-x86_64  # Amazon Linux 2
+      AutomaticStopTimeMinutes: 3600
+      InstanceType: !Ref EksWorkshopC9InstanceType
+      Name: snyk-hashicorp-cloud9
+      Tags: 
+        - Key: SSMBootstrap
+          Value: Active
+
+  EksWorkshopC9SSMDocument:
+    Type: AWS::SSM::Document
+    Properties:
+      DocumentType: Command
+      DocumentFormat: YAML
+      Content:
+        schemaVersion: '2.2'
+        description: Bootstrap Cloud9 Instance
+        mainSteps:
+          - action: aws:runShellScript
+            name: InstallTerraformAndSnyk
+            inputs:
+              runCommand:
+                - sudo yum install -y yum-utils
+                - sudo yum-config-manager --add-repo 'https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo'
+                - sudo yum -y install terraform
+                - curl https://static.snyk.io/cli/latest/snyk-linux -o snyk
+                - chmod +x ./snyk
+                - sudo mv ./snyk /usr/local/bin/
+                - cd ~/environment && git clone https://github.com/gautambaghel/vulnerable-ec2 && cd vulnerable-ec2
+
+  EksWorkshopC9LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action: 'sts:AssumeRole'
+      Path: "/"
+      Policies:
+        - PolicyName: LambdaExecutionPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: '*'
+
+  EksWorkshopC9BootstrapInstanceLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: index.lambda_handler
+      Role: !GetAtt EksWorkshopC9LambdaExecutionRole.Arn
+      Runtime: python3.8
+      Timeout: 900
+      MemorySize: 256
+      Code:
+        ZipFile: |
+          from __future__ import print_function
+          import boto3
+          import json
+          import os
+          import subprocess
+
+          def lambda_handler(event, context):
+              try:
+                  # Run the SSM document to bootstrap the Cloud9 instance
+                  ssm_client = boto3.client('ssm')
+                  response = ssm_client.send_command(
+                      InstanceIds=[event['instance_id']],
+                      DocumentName=event['ssm_document'],
+                      DocumentVersion='$LATEST',
+                      TimeoutSeconds=900,
+                      Parameters={
+                          'commands': [
+                              'cd ~/environment && git clone https://github.com/gautambaghel/vulnerable-ec2 && cd vulnerable-ec2',
+                              'sudo yum install -y yum-utils',
+                              'sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo',
+                              'sudo yum -y install terraform',
+                              'curl https://static.snyk.io/cli/latest/snyk-linux -o snyk',
+                              'chmod +x ./snyk',
+                              'sudo mv ./snyk /usr/local/bin/'
+                          ]
+                      }
+                  )
+                  command_id = response['Command']['CommandId']
+                  return {
+                      'statusCode': 200,
+                      'body': json.dumps('SSM command sent successfully. Command ID: {}'.format(command_id))
+                  }
+              except Exception as e:
+                  print('Error: {}'.format(str(e)))
+                  return {
+                      'statusCode': 500,
+                      'body': json.dumps('Error: {}'.format(str(e)))
+                  }
+
+Outputs:
+  Cloud9InstanceName:
+    Description: Name of the Cloud9 EC2 instance
+    Value: !Sub 'aws-cloud9-${EksWorkshopC9Instance.Name}-${EksWorkshopC9Instance}'
+
+  Cloud9Url:
+    Value: !Sub 'https://${AWS::Region}.console.aws.amazon.com/cloud9/ide/${EksWorkshopC9Instance}?region=${AWS::Region}'
