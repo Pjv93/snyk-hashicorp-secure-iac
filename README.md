@@ -1,4 +1,4 @@
-# [SNYK And HASHICORP Securing Your Infrastructure As Code Workshop](https://snyk-hashicorp.awsworkshop.io/)
+# [Snyk And Hashicorp - Securing Your Infrastructure As Code Workshop](https://snyk-hashicorp.awsworkshop.io/)
 
 **This is the setup steps to provision your AWS account to participate in the workshop**
 
