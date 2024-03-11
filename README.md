@@ -1,5 +1,6 @@
-# snyk-hashicorp-secure-iac
-SNYK AND HASHICORP SECURING YOUR INFRASTRUCTURE AS CODE Workshop CFT [https://snyk-hashicorp.awsworkshop.io/] 
+# [SNYK And HASHICORP Securing Your Infrastructure As Code Workshop](https://snyk-hashicorp.awsworkshop.io/)
+
+**This is the setup steps to provision your AWS account to participate in the workshop**
 
 ## In your AWS account
 
