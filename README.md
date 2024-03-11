@@ -28,7 +28,7 @@ https://console.aws.amazon.com/cloudshell/home
 > [!TIP]
 > If using the link above make sure the AWS console has opened in the region that you wish to run the labs in.
 
-![cloudshell terminal](/assets/images/cloud9-ide.png)
+![cloudshell terminal](/assets/images/cloudshell.png)
 
 Once CloudShell has loaded run the following commands:
 
@@ -47,3 +47,6 @@ The CloudFormation stack will take roughly 5 minutes to deploy, and once complet
 aws cloudformation describe-stacks --stack-name snyk-hashicorp-workshop-ide \
     --query 'Stacks[0].Outputs[?OutputKey==`Cloud9Url`].OutputValue' --output text
 ```
+Open this URL in a web browser to access the IDE:
+
+![cloud9 IDE](/assets/images/cloud9-ide.png)
