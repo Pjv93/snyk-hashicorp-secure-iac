@@ -1,7 +1,7 @@
 # snyk-hashicorp-secure-iac
 SNYK AND HASHICORP SECURING YOUR INFRASTRUCTURE AS CODE Workshop CFT [https://snyk-hashicorp.awsworkshop.io/] 
 
-##In your AWS account
+## In your AWS account
 
 > [!CAUTION]
 > Provisioning this workshop environment in your AWS account will create resources and there will be cost associated with them. The cleanup section provides a guide to remove them, preventing further charges.
