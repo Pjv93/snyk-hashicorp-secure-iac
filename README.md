@@ -16,6 +16,7 @@ What will this CloudFormation Template provision?
    - Snyk Cli
    - Terraform
    - 30 GB Volume
+   - clones https://github.com/gautambaghel/vulnerable-ec2 repo
 
 
 
