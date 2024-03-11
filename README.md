@@ -4,7 +4,7 @@ SNYK AND HASHICORP SECURING YOUR INFRASTRUCTURE AS CODE Workshop CFT [https://sn
 **In your AWS account**
 
 > [!CAUTION]
-> Provisioning this workshop environment in your AWS account will create resources and there will be cost associated with them. The cleanup > section provides a guide to remove them, preventing further charges.
+> Provisioning this workshop environment in your AWS account will create resources and there will be cost associated with them. The cleanup section provides a guide to remove them, preventing further charges.
 
 This section outlines how to set up the environment to run the labs in your own AWS account. 
 
