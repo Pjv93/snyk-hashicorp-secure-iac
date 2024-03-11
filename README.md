@@ -27,7 +27,7 @@ https://console.aws.amazon.com/cloudshell/home
 > [!TIP]
 > If using the link above make sure the AWS console has opened in the region that you wish to run the labs in.
 
-
+!(/assets/images/cloudshell.png)
 
 Once CloudShell has loaded run the following commands:
 
